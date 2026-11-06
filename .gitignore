@@ -1,0 +1,5 @@
+AirliftFFI.xcframework
+build/
+DerivedData/
+*.ipa
+.DS_Store
