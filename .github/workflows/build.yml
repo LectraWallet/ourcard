@@ -1,0 +1,47 @@
+name: Build unsigned IPA
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Show Xcode version
+        run: xcodebuild -version
+
+      - name: Build AirliftFFI.xcframework from source
+        run: |
+          chmod +x build-xcframework.sh
+          ./build-xcframework.sh
+
+      - name: Build (unsigned)
+        run: |
+          xcodebuild -project OurCard.xcodeproj \
+            -scheme OurCard \
+            -configuration Release \
+            -destination 'generic/platform=iOS' \
+            -derivedDataPath build/DerivedData \
+            clean build \
+            CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_ENTITLEMENTS="" CODE_SIGNING_ALLOWED=NO
+
+      - name: Package unsigned IPA
+        run: |
+          APP_PATH="$(find build/DerivedData/Build/Products -name "OurCard.app" -type d | head -n 1)"
+          if [ -z "$APP_PATH" ]; then echo "OurCard.app not found"; exit 1; fi
+          rm -rf "$APP_PATH/_CodeSignature" "$APP_PATH/embedded.mobileprovision"
+          mkdir -p build/Payload
+          cp -R "$APP_PATH" build/Payload/OurCard.app
+          cd build && zip -qr "OurCard-unsigned.ipa" Payload && rm -rf Payload
+          ls -la OurCard-unsigned.ipa
+
+      - name: Upload IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: OurCard-unsigned-ipa
+          path: build/OurCard-unsigned.ipa
