@@ -134,7 +134,7 @@ public final class PassBuilder {
                                       targetParentDir: "/var/mobile/Library/Passes",
                                       destName: bundle.lastPathComponent,
                                       log: log)
-        log("✅ Files injected. Reboot and check Wallet — if it doesn't appear, pass registration is the blocker (unverified).")
+        log("✅ Files injected. Wallet ignores unsigned passes, so it will not appear in Wallet — a Pass Type ID signature (paid developer account) is required to register a new pass.")
         log("It will only ever show in the Wallet pass list, never in the Apple Pay pay sheet, and it can't pay.")
     }
 
