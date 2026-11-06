@@ -52,12 +52,19 @@ public enum NeoSpring {
 </html>
 """
 
-    /// Preferred respring: ask the Rust core (al_device_respring). Falls back
-    /// to the NeoSpring WebKit crash when the tunnel path fails.
-    public static func respring(preferTunnel: Bool = true) async -> Bool {
-        if preferTunnel, await AirliftBridge.shared.respring() { return true }
+    /// True respring: the NeoSpring WebKit crash restarts SpringBoard
+    /// without rebooting the phone. (The old tunnel path sent Diagnostics
+    /// Relay "Restart", which is a FULL device reboot, not a respring —
+    /// it now lives in restartDevice() below, honestly labelled.)
+    public static func respring() async -> Bool {
         triggerWebKitRespring()
         return true // the crash either resprings or it doesn't; no callback exists
+    }
+
+    /// Full device reboot via Diagnostics Relay "Restart".
+    /// Useful after file injects: passd rescans passes at boot.
+    public static func restartDevice() async -> Bool {
+        await AirliftBridge.shared.respring()
     }
 
     /// Attaches a full-screen WKWebView running the crash page to the key window.
