@@ -5,6 +5,11 @@
 # (GitHub blocks files over 100 MB on push). Locally, run this once after
 # cloning, or keep using the prebuilt copy if you already have it.
 set -euo pipefail
+set -x
+
+echo "==> Preflight pwd=$(pwd) HOME=${HOME:-<unset>}"
+ls -la
+command -v cargo rustup xcodebuild || true
 
 ROOT="$(cd "$(dirname "$0")" && pwd)"
 cd "$ROOT/rust-core"
