@@ -14,7 +14,18 @@ command -v cargo rustup xcodebuild || true
 ROOT="$(cd "$(dirname "$0")" && pwd)"
 cd "$ROOT/rust-core"
 
-source "$HOME/.cargo/env" 2>/dev/null || true
+# cargo/rustup are already on PATH on the GitHub macOS runner (Homebrew rustup),
+# so sourcing ~/.cargo/env is optional. It must never kill the build: source
+# it with errexit off, because a failing command inside that file would
+# otherwise exit this script from within the sourced file (the `|| true`
+# on the source line does not protect against that).
+if [ -f "$HOME/.cargo/env" ]; then
+  set +e
+  # shellcheck disable=SC1091
+  source "$HOME/.cargo/env" 2>/dev/null
+  set -e
+fi
+export PATH="$HOME/.cargo/bin:/opt/homebrew/opt/rustup/bin:$PATH"
 
 export IPHONEOS_DEPLOYMENT_TARGET="${IPHONEOS_DEPLOYMENT_TARGET:-17.0}"
 export RUSTFLAGS="${RUSTFLAGS:-} --remap-path-prefix=${HOME}=/build"
