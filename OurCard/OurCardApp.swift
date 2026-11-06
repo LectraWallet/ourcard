@@ -46,6 +46,9 @@ struct RootView: View {
                     Button("Respring to apply") {
                         Task { await NeoSpring.respring() }
                     }
+                    Button("Restart device") {
+                        Task { await NeoSpring.restartDevice() }
+                    }
                     Button("Open Wallpaper settings") {
                         NeoSpring.openWallpaperSettings()
                     }
@@ -321,7 +324,7 @@ struct PassCardView: View {
 
             List(log, id: \.self) { Text($0).font(.caption).monospaced() }
 
-            Text("Shows in Wallet's pass list only — never in the Apple Pay pay sheet, and it can't pay. Install is experimental: pass registration is unverified, so it may not appear even if the files land. Reboot after installing and check Wallet.")
+            Text("Shows in Wallet's pass list only — never in the Apple Pay pay sheet, and it can't pay. Confirmed on-device: Wallet ignores unsigned passes, so a new pass will not appear even after a reboot. Only a pass signed with an Apple Pass Type ID (paid developer account) can register. To change how a card looks, use Card skins on a card you already have.")
                 .font(.caption).foregroundColor(.secondary).padding(.horizontal)
         }
         .navigationTitle("Custom pass card")
